@@ -5,6 +5,7 @@ from vae_helpers import HModule, get_1x1, get_3x3, DmolNet, draw_gaussian_diag_s
 from collections import defaultdict
 import numpy as np
 import itertools
+import pygenbrix_layer as pygl
 
 
 class Block(nn.Module):
@@ -222,6 +223,11 @@ class Decoder(HModule):
 
 
 class VAE(HModule):
+
+    def __init__(self, H, pygenbrix_layer):
+        super().__init__(H)
+        self.vdvae_pygenbrix_layer = pygl.VDVAEPyGenBrixLayer(H, pygenbrix_layer)
+
     def build(self):
         self.encoder = Encoder(self.H)
         self.decoder = Decoder(self.H)
@@ -229,7 +235,7 @@ class VAE(HModule):
     def forward(self, x, x_target):
         activations = self.encoder.forward(x)
         px_z, stats = self.decoder.forward(activations)
-        distortion_per_pixel = self.decoder.out_net.nll(px_z, x_target)
+        distortion_per_pixel = self.vdvae_pygenbrix_layer.nll(px_z, x_target)
         rate_per_pixel = torch.zeros_like(distortion_per_pixel)
         ndims = np.prod(x.shape[1:])
         for statdict in stats:
@@ -245,8 +251,8 @@ class VAE(HModule):
 
     def forward_uncond_samples(self, n_batch, t=None):
         px_z = self.decoder.forward_uncond(n_batch, t=t)
-        return self.decoder.out_net.sample(px_z)
+        return self.vdvae_pygenbrix_layer.sample(px_z)
 
     def forward_samples_set_latents(self, n_batch, latents, t=None):
         px_z = self.decoder.forward_manual_latents(n_batch, latents, t=t)
-        return self.decoder.out_net.sample(px_z)
+        return self.vdvae_pygenbrix_layer.sample(px_z)

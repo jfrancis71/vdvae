@@ -15,7 +15,7 @@ from utils import (logger,
 from data import mkdir_p
 from contextlib import contextmanager
 import torch.distributed as dist
-from apex.optimizers import FusedAdam as AdamW
+#from apex.optimizers import FusedAdam as AdamW
 from vae import VAE
 from torch.nn.parallel.distributed import DistributedDataParallel
 

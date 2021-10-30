@@ -21,10 +21,7 @@ class VDVAEPyGenBrixLayer(nn.Module):
 
     def sample(self, px_z):
         im = self.pygenbrix_layer(self.forward(px_z)).sample()
-        xhat = im*255.0
-        xhat = xhat.detach().cpu().numpy()
-        xhat = np.minimum(np.maximum(0.0, xhat), 255.0).astype(np.uint8)
-        return xhat
+        return im
 
 
 class VDVAEDiscMixtureLayer(nn.Module):

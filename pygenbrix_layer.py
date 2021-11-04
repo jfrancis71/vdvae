@@ -25,15 +25,15 @@ class VDVAEPyGenBrixLayer(nn.Module):
 
 
 class VDVAEDiscMixtureLayer(nn.Module):
-    def __init__(self, H):
+    def __init__(self, num_mixtures):
         super().__init__()
-        self.H = H
+        self.num_mixtures = num_mixtures
 
     def forward(self, x):
-        return VDVAEDiscMixtureDistribution(logits=x, num_mixtures=self.H.num_mixtures)
+        return VDVAEDiscMixtureDistribution(logits=x, num_mixtures=self.num_mixtures)
 
     def params_size(self, channels):
-        return self.H.num_mixtures * 10
+        return self.num_mixtures * 10
 
 
 #Might not be correct for ffhq_256 
